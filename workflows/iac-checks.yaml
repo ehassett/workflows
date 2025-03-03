@@ -1,0 +1,81 @@
+name: IaC Checks
+
+on:
+  workflow_call:
+    inputs:
+      tool:
+        description: Tool to use (`terraform` or `tofu`)
+        required: true
+        type: string
+      tool-version:
+        description: Version of Terraform or OpenTofu to use
+        required: false
+        type: string
+        default: "latest"
+      working-directory:
+        description: Location of IaC configuration
+        required: false
+        type: string
+        default: "."
+
+jobs:
+  iac-checks:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory}}
+    steps:
+      - name: Validate tool input
+        shell: bash
+        run: |
+          if [ "${{ inputs.tool }}" != "terraform" ] && [ "${{ inputs.tool }}" != "tofu" ]; then
+            echo "Invalid tool input: ${{ inputs.tool }}"
+            exit 1
+          fi
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up OpenTofu
+        if: ${{ inputs.tool == 'tofu' }}
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: ${{ inputs.tool-version }}
+
+      - name: Set up Terraform
+        if: ${{ inputs.tool == 'terraform' }}
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.tool-version }}
+
+      - name: Set up tflint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Initialize IaC
+        run: ${{ inputs.tool }} init
+        shell: bash
+
+      - name: Validate IaC formatting
+        run: ${{ inputs.tool }} fmt -check
+        shell: bash
+
+      - name: Validate IaC configuration
+        run: ${{ inputs.tool }} validate
+        shell: bash
+
+      - name: Initialize tflint
+        run: tflint --init
+        shell: bash
+
+      - name: Run tflint
+        run: tflint -f compact
+        shell: bash
+
+      - name: Run checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          framework: terraform
+          download_external_modules: true
