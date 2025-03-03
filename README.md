@@ -18,7 +18,7 @@ This repo contains a collection of reusable GitHub Actions workflows.
 
 # IaC Checks
 
-The [IaC Checks workflow](./iac-checks.yaml) runs a basic set of checks on Terraform or OpenTofu codebases.
+The [IaC Checks workflow](.github/workflows/iac-checks.yaml) runs a basic set of checks on Terraform or OpenTofu codebases.
 
 Checks include:
 
