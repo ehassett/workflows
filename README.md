@@ -54,7 +54,7 @@ on:
 jobs:
   iac-checks:
     name: IaC Checks
-    uses: ehassett/workflows/workflows/iac-checks.yaml@main
+    uses: ehassett/workflows/.github/workflows/iac-checks.yaml@main
     with:
       tool: "tofu"
       tool-version: "1.9.0"
@@ -73,7 +73,7 @@ on:
 jobs:
   iac-checks:
     name: IaC Checks
-    uses: ehassett/workflows/workflows/iac-checks.yaml@main
+    uses: ehassett/workflows/.github/workflows/iac-checks.yaml@main
     strategy:
       fail-fast: false
       matrix:
