@@ -25,6 +25,12 @@ jobs:
       run:
         working-directory: ${{ inputs.working-directory}}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
       - name: Validate tool input
         shell: bash
         run: |
@@ -32,12 +38,6 @@ jobs:
             echo "Invalid tool input: ${{ inputs.tool }}"
             exit 1
           fi
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-          fetch-depth: 0
 
       - name: Set up OpenTofu
         if: ${{ inputs.tool == 'tofu' }}
