@@ -79,3 +79,4 @@ jobs:
         with:
           framework: terraform
           download_external_modules: true
+          directory: ${{ inputs.working-directory }}
